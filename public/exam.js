@@ -137,7 +137,7 @@ function submitExam() {
     .then(response => response.json())
     .then(data => {
         console.log(data);
-        alert("Your answers have been submitted.");
+        alert(`Your answers have been submitted. Score: ${data.score}/${data.total}`);
     })
     .catch(error => {
         console.error('Error submitting answers:', error);
@@ -232,11 +232,14 @@ document.getElementById('submit-answer-btn').addEventListener('click', function(
     });
 });
 
-function nextQuestion() {
-    currentQuestionIndex++;
-    if (currentQuestionIndex < questions.length) {
-        document.getElementById('question').innerText = questions[currentQuestionIndex];
-    } else {
-        alert("No more questions available.");
-    }
-}
+// Remove or comment out the nextQuestion function and any related event listeners
+// function nextQuestion() {
+//     currentQuestionIndex++;
+//     if (currentQuestionIndex < questions.length) {
+//         document.getElementById('question').innerText = questions[currentQuestionIndex];
+//     } else {
+//         alert("No more questions available.");
+//     }
+// }
+
+

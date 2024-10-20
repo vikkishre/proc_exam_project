@@ -31,22 +31,36 @@ db.connect(err => {
     console.log('Connected to the database.');
 });
 
-// Endpoint to submit answers
+// Endpoint to submit answers and check correctness
 app.post('/submit-answer', (req, res) => {
-    const answers = req.body.answers; // Expecting an array of answers
+    const userAnswers = req.body.answers; // Expecting an array of answers
 
-    // Prepare SQL query to insert answers
-    const query = 'INSERT INTO answers (question_id, answer) VALUES ?';
-    const values = answers.map(answer => [answer.question_id, answer.answer]);
+    // Prepare SQL query to fetch correct answers for the submitted questions
+    const questionIds = userAnswers.map(answer => answer.question_id);
+    const query = 'SELECT id, correct_answer FROM questions WHERE id IN (?)';
 
-    // Execute the query with the array of values
-    db.query(query, [values], (err, results) => {
+    db.query(query, [questionIds], (err, results) => {
         if (err) {
-            console.error('Error inserting answers:', err);
-            return res.status(500).send('Error saving answers');
+            console.error('Error fetching correct answers:', err);
+            return res.status(500).send('Error fetching correct answers');
         }
-        // Sending a success response
-        res.status(200).send({ message: 'Answers saved successfully', affectedRows: results.affectedRows });
+
+        // Map of question IDs to correct answers
+        const correctAnswers = results.reduce((map, item) => {
+            map[item.id] = item.correct_answer;
+            return map;
+        }, {});
+
+        // Compare user answers with correct answers
+        const score = userAnswers.reduce((score, answer) => {
+            if (answer.answer === correctAnswers[answer.question_id]) {
+                return score + 1; // Increment score for each correct answer
+            }
+            return score;
+        }, 0);
+
+        // Respond with the user's score
+        res.status(200).send({ score: score, total: userAnswers.length });
     });
 });
 
