@@ -105,9 +105,43 @@ app.get('/questions', (req, res) => {
     });
 });
 
+// Endpoint to report user violations
+app.post('/report-violation', (req, res) => {
+    const { userId, reason, violationCount, timestamp } = req.body;
+
+    // Insert the report into the user_reports table
+    const query = 'INSERT INTO blocked_users (user_id, blocked_at) VALUES (?, NOW())';
+    db.query(query, [userId, reason, violationCount, timestamp], (err, result) => {
+        if (err) {
+            console.error('Error reporting violation:', err);
+            return res.status(500).json({ error: 'Error reporting violation' });
+        }
+        res.status(200).json({ message: 'Violation reported successfully' });
+    });
+});
+
+// Endpoint to block a user
+app.post('/block-user', (req, res) => {
+    const { userId } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    // Insert logic to block the user in the database
+    const query = 'INSERT INTO blocked_users (user_id, blocked_at) VALUES (?, NOW())';
+    db.query(query, [userId], (err, result) => {
+        if (err) {
+            console.error('Error blocking user:', err);
+            return res.status(500).json({ error: 'Error blocking user' });
+        }
+        res.status(200).json({ message: 'User blocked successfully' });
+    });
+});
+
 // Setting the port for the server
 const PORT = 3000;
 // Starting the server
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on ${PORT}`);
 });

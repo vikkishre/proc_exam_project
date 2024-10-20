@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Score</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Your Exam Score</h1>
+    </header>
+    <main>
+        <div id="score-container" style="text-align: center; margin-top: 20%;">
+            <h2>Your Score: <span id="score"></span></h2>
+            <h3>Total Questions: <span id="total"></span></h3>
+            <button onclick="goBack()">Go Back to Exam</button>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2023 Proctored Exam Tool. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Function to get URL parameters
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            const regex = /([^&=]+)=([^&]*)/g;
+            let m;
+            while (m = regex.exec(queryString)) {
+                params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+            }
+            return params;
+        }
+
+        // Display the score
+        const params = getQueryParams();
+        document.getElementById('score').textContent = params.score || '0';
+        document.getElementById('total').textContent = params.total || '0';
+
+        // Function to go back to the exam
+        function goBack() {
+            window.location.href = 'index.html'; // Redirect back to the exam page
+        }
+    </script>
+</body>
+</html>
+

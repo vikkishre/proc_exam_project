@@ -5,6 +5,7 @@ body {
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
+    user-select: none; /* Disable text selection */
 }
 
 header {
@@ -77,6 +78,7 @@ footer {
     font-weight: bold; /* Make the question text bold */
     font-size: 1.2em; /* Increase the font size of the question */
     margin-bottom: 10px; /* Add some space below the question */
+    user-select: none; /* Disable text selection for questions */
 }
 
 /* Style for the options */
@@ -85,6 +87,7 @@ footer {
     opacity: 0.8; /* Decrease the opacity of the options */
     display: block; /* Ensure each option is on a new line */
     margin-bottom: 5px; /* Add some space below each option */
+    user-select: none; /* Disable text selection for options */
 }
 
 /* Optional: Style for the input fields */
@@ -94,4 +97,5 @@ footer {
     margin-bottom: 10px; /* Add some space below the input */
     width: 100%; /* Make the input take full width */
     box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    user-select: none; /* Disable text selection for input fields */
 }

@@ -4,20 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fullscreen Exit Alert</title>
+    <style>
+        /* Basic styling to ensure visibility */
+        #enter-fullscreen-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-    <div id="fullscreen-exit-message" style="display: none; text-align: center; margin-top: 20%;">
-        <h1>You have exited fullscreen mode.</h1>
-        <p>Please re-enter fullscreen mode to continue the exam.</p>
-        <button onclick="reenterFullscreen()">Re-enter Fullscreen</button>
+    <div id="fullscreen-message" style="text-align: center; margin-top: 20%;">
+        <h1>Enter Fullscreen to Start the Exam</h1>
+        <p>Please ensure that your browser is in fullscreen mode before proceeding.<b>(By pressing F11)</b></p>
+        
+        <button id="enter-fullscreen-btn" onclick="enterFullscreen()">Enter Test Screen</button>
     </div>
+
     <script>
-        function checkFullscreenStatus() {
-            if (!document.fullscreenElement) {
-                document.getElementById('fullscreen-exit-message').style.display = 'block';
-            } else {
-                document.getElementById('fullscreen-exit-message').style.display = 'none';
+        function enterFullscreen() {
+            let element = document.documentElement; // The entire page
+
+            // Request fullscreen
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.mozRequestFullScreen) { // Firefox
+                element.mozRequestFullScreen();
+            } else if (element.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) { // IE/Edge
+                element.msRequestFullscreen();
             }
+
+            // Immediately navigate to index.html after requesting fullscreen
+            navigateToIndex();
+        }
+
+        function navigateToIndex() {
+            window.location.href = 'index.html';
         }
     </script>
 </body>
