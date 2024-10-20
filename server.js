@@ -33,11 +33,13 @@ db.connect(err => {
 
 // Endpoint to submit answers and check correctness
 app.post('/submit-answer', (req, res) => {
+    console.log("Received request body:", req.body);
     const userAnswers = req.body.answers;
     console.log("Received answers:", userAnswers);
 
     if (!userAnswers || userAnswers.length === 0) {
-        return res.status(400).send('No answers provided');
+        console.error('No answers provided');
+        return res.status(400).json({ error: 'No answers provided' });
     }
 
     // Get all question IDs from the submitted answers
@@ -48,7 +50,7 @@ app.post('/submit-answer', (req, res) => {
     db.query(deleteQuery, [questionIds], (deleteErr, deleteResult) => {
         if (deleteErr) {
             console.error('Error deleting old answers:', deleteErr);
-            return res.status(500).send('Error deleting old answers');
+            return res.status(500).json({ error: 'Error deleting old answers' });
         }
 
         console.log("Old answers deleted. Affected rows:", deleteResult.affectedRows);
@@ -60,7 +62,7 @@ app.post('/submit-answer', (req, res) => {
         db.query(insertQuery, [values], (insertErr, insertResult) => {
             if (insertErr) {
                 console.error('Error inserting new answers:', insertErr);
-                return res.status(500).send('Error saving new answers');
+                return res.status(500).json({ error: 'Error saving new answers' });
             }
 
             console.log("New answers inserted. Affected rows:", insertResult.affectedRows);
@@ -70,7 +72,7 @@ app.post('/submit-answer', (req, res) => {
             db.query(scoreQuery, [questionIds], (scoreErr, scoreResults) => {
                 if (scoreErr) {
                     console.error('Error fetching correct answers:', scoreErr);
-                    return res.status(500).send('Error calculating score');
+                    return res.status(500).json({ error: 'Error calculating score' });
                 }
 
                 const correctAnswers = scoreResults.reduce((map, item) => {
@@ -85,7 +87,7 @@ app.post('/submit-answer', (req, res) => {
                     return score;
                 }, 0);
 
-                res.status(200).send({ score: score, total: userAnswers.length });
+                res.status(200).json({ score: score, total: userAnswers.length });
             });
         });
     });

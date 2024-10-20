@@ -130,8 +130,10 @@ function submitExam() {
             }
         }
 
-        // Push the answer even if it's empty
-        answers.push({ question_id: parseInt(questionId), answer: answer });
+        // Ensure question_id is not null
+        if (questionId) {
+            answers.push({ question_id: parseInt(questionId), answer: answer });
+        }
     });
 
     console.log("Answers collected:", answers);
@@ -143,7 +145,14 @@ function submitExam() {
         },
         body: JSON.stringify({ answers: answers })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+            });
+        }
+        return response.json();
+    })
     .then(data => {
         console.log("Server response:", data);
         alert(`Your answers have been submitted. Score: ${data.score}/${data.total}`);
@@ -151,7 +160,7 @@ function submitExam() {
     })
     .catch(error => {
         console.error('Error submitting answers:', error);
-        alert("There was an error submitting your answers. Please try again.");
+        alert(`There was an error submitting your answers: ${error.message}. Please try again.`);
     });
 }
 
@@ -167,15 +176,15 @@ document.addEventListener('DOMContentLoaded', function() {
             questions.forEach((question, index) => {
                 const questionElement = document.createElement('div');
                 questionElement.classList.add('question');
+                questionElement.setAttribute('data-id', question.id); // Ensure this is set
 
                 // Create a paragraph element for the question prompt
                 const prompt = document.createElement('p');
-                // Add question number using the index + 1 (since index is 0-based)
                 prompt.textContent = `Question ${index + 1}: ${question.prompt}`;
                 questionElement.appendChild(prompt);
 
                 if (question.options) {
-                    const options = question.options.split(','); // Split the options by comma
+                    const options = question.options.split(',');
                     options.forEach(option => {
                         const label = document.createElement('label');
                         label.textContent = option;
@@ -184,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         radio.type = 'radio';
                         radio.name = `question-${question.id}`; // Group by question ID
                         radio.value = option;
-                        radio.setAttribute('data-id', question.id); // Store question ID
+                        radio.setAttribute('data-id', question.id); // Ensure this is set
 
                         label.prepend(radio);
                         questionElement.appendChild(label);
@@ -193,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const input = document.createElement('input');
                     input.type = 'text';
                     input.placeholder = 'Your answer here';
-                    input.setAttribute('data-id', question.id); // Store question ID
+                    input.setAttribute('data-id', question.id); // Ensure this is set
                     questionElement.appendChild(input);
                 }
 
