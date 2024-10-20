@@ -108,24 +108,40 @@ function logEvent(eventType, description) {
 
 // Function to handle exam submission
 function submitExam() {
-    const answer = document.getElementById('answer').value;
-    const question = document.getElementById('question').innerText;
+    // Stop the timer
+    clearInterval(timerInterval);
 
-    // Send the answer to the server
-    fetch('submit_answer.php', {
+    // Initialize an array to hold the answers
+    const answers = [];
+    // Retrieve all input elements for answers
+    const inputs = document.querySelectorAll('input[type="radio"]:checked, input[type="text"]');
+
+    // Loop through each input element
+    inputs.forEach(input => {
+        // Retrieve the question ID from the data attribute
+        const questionId = input.getAttribute('data-id');
+        const answer = input.value;
+
+        // Add the question ID and answer to the answers array
+        answers.push({ question_id: questionId, answer: answer });
+    });
+
+    // Send all answers to the server
+    fetch('/submit-answer', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ question, answer }),
+        body: JSON.stringify({ answers: answers })
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Success:', data);
-        alert('Your answer has been submitted!');
+        console.log(data);
+        alert("Your answers have been submitted.");
     })
-    .catch((error) => {
-        console.error('Error:', error);
+    .catch(error => {
+        console.error('Error submitting answers:', error);
+        alert("There was an error submitting your answers.");
     });
 }
 
@@ -136,14 +152,16 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(questions => {
             // Retrieve the question container from the DOM
-            const questionContainer = document.getElementById('exam-container');
+            const questionContainer = document.getElementById('question-container');
             // Loop through each question and create a question element
-            questions.forEach(question => {
+            questions.forEach((question, index) => {
                 const questionElement = document.createElement('div');
                 questionElement.classList.add('question');
 
+                // Create a paragraph element for the question prompt
                 const prompt = document.createElement('p');
-                prompt.textContent = question.prompt;
+                // Add question number using the index + 1 (since index is 0-based)
+                prompt.textContent = `Question ${index + 1}: ${question.prompt}`;
                 questionElement.appendChild(prompt);
 
                 if (question.options) {

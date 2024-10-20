@@ -33,19 +33,20 @@ db.connect(err => {
 
 // Endpoint to submit answers
 app.post('/submit-answer', (req, res) => {
-    // Extracting question_id and answer from the request body
-    const { question_id, answer } = req.body;
+    const answers = req.body.answers; // Expecting an array of answers
 
-    // SQL query to insert the answer into the database
-    const query = 'INSERT INTO answers (question_id, answer) VALUES (?, ?)';
-    // Executing the query with the provided question_id and answer
-    db.query(query, [question_id, answer], (err, results) => {
+    // Prepare SQL query to insert answers
+    const query = 'INSERT INTO answers (question_id, answer) VALUES ?';
+    const values = answers.map(answer => [answer.question_id, answer.answer]);
+
+    // Execute the query with the array of values
+    db.query(query, [values], (err, results) => {
         if (err) {
-            console.error('Error inserting answer:', err);
-            return res.status(500).send('Error saving answer');
+            console.error('Error inserting answers:', err);
+            return res.status(500).send('Error saving answers');
         }
-        // Sending a success response with the insertId
-        res.status(200).send({ message: 'Answer saved successfully', id: results.insertId });
+        // Sending a success response
+        res.status(200).send({ message: 'Answers saved successfully', affectedRows: results.affectedRows });
     });
 });
 
