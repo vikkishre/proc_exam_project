@@ -33,34 +33,61 @@ db.connect(err => {
 
 // Endpoint to submit answers and check correctness
 app.post('/submit-answer', (req, res) => {
-    const userAnswers = req.body.answers; // Expecting an array of answers
+    const userAnswers = req.body.answers;
+    console.log("Received answers:", userAnswers);
 
-    // Prepare SQL query to fetch correct answers for the submitted questions
+    if (!userAnswers || userAnswers.length === 0) {
+        return res.status(400).send('No answers provided');
+    }
+
+    // Get all question IDs from the submitted answers
     const questionIds = userAnswers.map(answer => answer.question_id);
-    const query = 'SELECT id, correct_answer FROM questions WHERE id IN (?)';
 
-    db.query(query, [questionIds], (err, results) => {
-        if (err) {
-            console.error('Error fetching correct answers:', err);
-            return res.status(500).send('Error fetching correct answers');
+    // First, delete all existing answers for these questions
+    const deleteQuery = 'DELETE FROM answers WHERE question_id IN (?)';
+    db.query(deleteQuery, [questionIds], (deleteErr, deleteResult) => {
+        if (deleteErr) {
+            console.error('Error deleting old answers:', deleteErr);
+            return res.status(500).send('Error deleting old answers');
         }
 
-        // Map of question IDs to correct answers
-        const correctAnswers = results.reduce((map, item) => {
-            map[item.id] = item.correct_answer;
-            return map;
-        }, {});
+        console.log("Old answers deleted. Affected rows:", deleteResult.affectedRows);
 
-        // Compare user answers with correct answers
-        const score = userAnswers.reduce((score, answer) => {
-            if (answer.answer === correctAnswers[answer.question_id]) {
-                return score + 1; // Increment score for each correct answer
+        // Now insert the new answers
+        const insertQuery = 'INSERT INTO answers (question_id, answer) VALUES ?';
+        const values = userAnswers.map(answer => [answer.question_id, answer.answer]);
+
+        db.query(insertQuery, [values], (insertErr, insertResult) => {
+            if (insertErr) {
+                console.error('Error inserting new answers:', insertErr);
+                return res.status(500).send('Error saving new answers');
             }
-            return score;
-        }, 0);
 
-        // Respond with the user's score
-        res.status(200).send({ score: score, total: userAnswers.length });
+            console.log("New answers inserted. Affected rows:", insertResult.affectedRows);
+
+            // Fetch correct answers and calculate score
+            const scoreQuery = 'SELECT id, correct_answer FROM questions WHERE id IN (?)';
+            db.query(scoreQuery, [questionIds], (scoreErr, scoreResults) => {
+                if (scoreErr) {
+                    console.error('Error fetching correct answers:', scoreErr);
+                    return res.status(500).send('Error calculating score');
+                }
+
+                const correctAnswers = scoreResults.reduce((map, item) => {
+                    map[item.id] = item.correct_answer;
+                    return map;
+                }, {});
+
+                const score = userAnswers.reduce((score, answer) => {
+                    if (answer.answer === correctAnswers[answer.question_id]) {
+                        return score + 1;
+                    }
+                    return score;
+                }, 0);
+
+                res.status(200).send({ score: score, total: userAnswers.length });
+            });
+        });
     });
 });
 

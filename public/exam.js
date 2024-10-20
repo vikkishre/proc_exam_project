@@ -108,25 +108,34 @@ function logEvent(eventType, description) {
 
 // Function to handle exam submission
 function submitExam() {
-    // Stop the timer
+    console.log("Submitting exam...");
     clearInterval(timerInterval);
 
-    // Initialize an array to hold the answers
     const answers = [];
-    // Retrieve all input elements for answers
-    const inputs = document.querySelectorAll('input[type="radio"]:checked, input[type="text"]');
+    const questionElements = document.querySelectorAll('.question');
 
-    // Loop through each input element
-    inputs.forEach(input => {
-        // Retrieve the question ID from the data attribute
-        const questionId = input.getAttribute('data-id');
-        const answer = input.value;
+    questionElements.forEach(questionElement => {
+        const questionId = questionElement.getAttribute('data-id');
+        let answer = '';
 
-        // Add the question ID and answer to the answers array
-        answers.push({ question_id: questionId, answer: answer });
+        // Check for radio buttons (multiple choice)
+        const selectedRadio = questionElement.querySelector('input[type="radio"]:checked');
+        if (selectedRadio) {
+            answer = selectedRadio.value;
+        } else {
+            // Check for text input
+            const textInput = questionElement.querySelector('input[type="text"]');
+            if (textInput) {
+                answer = textInput.value.trim();
+            }
+        }
+
+        // Push the answer even if it's empty
+        answers.push({ question_id: parseInt(questionId), answer: answer });
     });
 
-    // Send all answers to the server
+    console.log("Answers collected:", answers);
+
     fetch('/submit-answer', {
         method: 'POST',
         headers: {
@@ -136,12 +145,13 @@ function submitExam() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        console.log("Server response:", data);
         alert(`Your answers have been submitted. Score: ${data.score}/${data.total}`);
+        document.querySelector('button[onclick="submitExam()"]').disabled = true;
     })
     .catch(error => {
         console.error('Error submitting answers:', error);
-        alert("There was an error submitting your answers.");
+        alert("There was an error submitting your answers. Please try again.");
     });
 }
 
