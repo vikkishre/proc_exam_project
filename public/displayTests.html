@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Tests</title>
+    <link rel="stylesheet" href="displayTests.css">
+    <script>
+        async function fetchTests() {
+            try {
+                const response = await fetch('http://localhost:3000/display_tests');
+        
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+        
+                const tests = await response.json();
+                const testList = document.getElementById('testList');
+        
+                // Clear previous entries
+                testList.innerHTML = '';
+        
+                // Check if tests are returned
+                if (tests.length === 0) {
+                    testList.innerHTML = '<li>No tests found.</li>';
+                } else {
+                    tests.forEach(test => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <strong>Question:</strong> ${test.prompt}<br>
+                            <span class="options">Options: ${test.options.join(', ')}</span><br>
+                            <strong>Correct Answer:</strong> ${test.correct_answer}
+                        `;
+                        testList.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching tests:', error);
+                const testList = document.getElementById('testList');
+                testList.innerHTML = '<li>Error loading tests. Please try again later.</li>';
+            }
+        }
+
+        function submitTests() {
+            // Generate a random 5-digit code
+            const randomCode = generateRandomCode();
+            alert(`Your random code is: ${randomCode}`); // Alert the random code
+        }
+
+        // Function to generate a random 5-digit code
+        function generateRandomCode() {
+            return Math.floor(10000 + Math.random() * 90000); // Generates a number between 10000 and 99999
+        }
+
+        window.onload = fetchTests; // Fetch tests on page load
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>All Questions for Test</h1>
+        <ul id="testList"></ul>
+        <button onclick="fetchTests()">Refresh Questions</button>
+        <button onclick="window.location.href='createTest.html'">Go Back to Create Test</button>
+        <button onclick="submitTests()">Submit Tests</button> <!-- New Submit Button -->
+    </div>
+</body>
+</html>

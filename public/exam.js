@@ -12,7 +12,7 @@ const questions = [
 
 // Violation tracking
 let violationCount = 0;
-const maxViolations = 3; // Set the maximum number of violations allowed
+const maxViolations = 4; // Set the maximum number of violations allowed
 let examBlocked = false;
 let examStarted = false; // Flag to indicate if the exam has started
 

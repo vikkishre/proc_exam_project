@@ -1,0 +1,30 @@
+.button-link {
+    display: inline-block; /* Make the link behave like a button */
+    width: 180px;
+    height: 60px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    text-align: center; /* Center the text */
+    line-height: 60px; /* Vertically center the text */
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.button-link:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+h1{
+    text-align: center;
+}
+.container{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.parent-container{
+    margin-top: 150px;
+}

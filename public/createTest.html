@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Test</title>
+    <link rel="stylesheet" href="createTest.css">
+    <script>
+        let questionCount = 1; // To keep track of the number of questions
+
+        async function submitTest(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const questions = [];
+            const questionInputs = document.querySelectorAll('.question-input');
+
+            questionInputs.forEach((questionInput, index) => {
+                const prompt = questionInput.querySelector('input[placeholder="Enter Question"]').value;
+                const options = document.querySelector(`#options-${index + 1}`).value.split(',').map(opt => opt.trim());
+                const correctAnswer = document.querySelector(`#correct-answer-${index + 1}`).value;
+
+                // Validate inputs and push questions to the array
+                if (prompt && options.length === 4 && correctAnswer) {
+                    questions.push({ prompt, options, correct_answer: correctAnswer });
+                }
+            });
+
+            // POST request to the server
+            const response = await fetch('http://localhost:3000/submit_test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ questions })
+            });
+
+            const result = await response.json();
+            alert(result.message); // Display result message
+
+            // Generate a random 5-digit code
+            const randomCode = generateRandomCode();
+            alert(`Your random code is: ${randomCode}`); // Alert the random code
+
+            // Clear the form fields
+            document.getElementById('createTestForm').reset();
+        }
+
+        // Function to generate a random 5-digit code
+        function generateRandomCode() {
+            return Math.floor(10000 + Math.random() * 90000); // Generates a number between 10000 and 99999
+        }
+
+        function addQuestion() {
+            questionCount++;
+            const questionsDiv = document.getElementById('questions');
+            const newQuestion = `
+                <div class="question-input">
+                    <h3>Question ${questionCount}:</h3>
+                    <input type="text" placeholder="Enter Question" required>
+                    <br>
+                    <label>Options (comma-separated):</label>
+                    <input type="text" id="options-${questionCount}" placeholder="Option 1, Option 2, Option 3, Option 4" required>
+                    <br>
+                    <label>Correct Answer:</label>
+                    <input type="text" id="correct-answer-${questionCount}" placeholder="Correct Answer" required>
+                </div>
+            `;
+            questionsDiv.insertAdjacentHTML('beforeend', newQuestion);
+        }
+
+        async function displayQuestions() {
+            const response = await fetch('http://localhost:3000/display_tests');
+            const tests = await response.json();
+            const displayDiv = document.getElementById('displayArea');
+            displayDiv.innerHTML = ''; // Clear previous results
+            
+            tests.forEach(test => {
+                const testItem = `
+                    <div class="test-item">
+                        <h4>${test.prompt}</h4>
+                        <p>Options: ${JSON.parse(test.options).join(',')}</p>
+                        <p>Correct Answer: ${test.correct_answer}</p>
+                    </div>
+                `;
+                displayDiv.insertAdjacentHTML('beforeend', testItem);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Test</h1>
+        <form id="createTestForm" onsubmit="submitTest(event)">
+            <div id="questions">
+                <div class="question-input">
+                    <h3>Question 1:</h3>
+                    <input type="text" placeholder="Enter Question" required>
+                    <br>
+                    <label>Options (comma-separated):</label>
+                    <input type="text" id="options-1" placeholder="Option 1, Option 2, Option 3, Option 4" required>
+                    <br>
+                    <label>Correct Answer:</label>
+                    <input type="text" id="correct-answer-1" placeholder="Correct Answer" required>
+                </div>
+            </div>
+            <button type="button" onclick="addQuestion()">Add Another Question</button>
+            <button type="submit">Submit Questions</button>
+        </form>
+        <button type="button" onclick="window.location.href='displayTests.html'">Display Questions</button>
+        <div id="displayArea"></div>
+    </div>
+</body>
+</html>
