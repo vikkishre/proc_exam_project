@@ -3,11 +3,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
+const cors = require('cors');
 
 // Creating an instance of express
 const app = express();
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
+app.use(cors());
+
+// Serve static files from a directory (e.g., 'public')
+app.use(express.static('public'));
 
 // Creating a connection to the MySQL database
 const db = mysql.createConnection({
