@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fullscreen Exit Alert</title>
+</head>
+<body>
+    <div id="fullscreen-exit-message" style="display: none; text-align: center; margin-top: 20%;">
+        <h1>You have exited fullscreen mode.</h1>
+        <p>Please re-enter fullscreen mode to continue the exam.</p>
+        <button onclick="reenterFullscreen()">Re-enter Fullscreen</button>
+    </div>
+    <script>
+        function checkFullscreenStatus() {
+            if (!document.fullscreenElement) {
+                document.getElementById('fullscreen-exit-message').style.display = 'block';
+            } else {
+                document.getElementById('fullscreen-exit-message').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
