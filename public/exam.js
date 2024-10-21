@@ -300,63 +300,6 @@ document.getElementById('submit-answer-btn').addEventListener('click', function(
     submitExam();
 });
 
-// Function to handle exam submission
-// function submitExam() {
-//     console.log("Submitting exam...");
-//     clearInterval(timerInterval);
-//     localStorage.removeItem('timeLeft'); // Clear the saved time when the exam is submitted
-
-//     const answers = [];
-//     const questionElements = document.querySelectorAll('.question');
-
-//     questionElements.forEach(questionElement => {
-//         const questionId = questionElement.getAttribute('data-id');
-//         let answer = '';
-
-//         const selectedRadio = questionElement.querySelector('input[type="radio"]:checked');
-//         if (selectedRadio) {
-//             answer = selectedRadio.value;
-//         } else {
-//             const textInput = questionElement.querySelector('input[type="text"]');
-//             if (textInput) {
-//                 answer = textInput.value.trim();
-//             }
-//         }
-
-//         if (questionId) {
-//             answers.push({ question_id: parseInt(questionId), answer: answer });
-//         }
-//     });
-
-//     console.log("Answers collected:", answers);
-
-//     fetch('/submit-answer', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({ answers: answers })
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             return response.text().then(text => {
-//                 throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
-//             });
-//         }
-//         return response.json();
-//     })
-//     .then(data => {
-//         console.log("Server response:", data);
-//         // Redirect to the score page
-//         window.location.href = `score.html?score=${data.score}&total=${data.total}`;
-//     })
-//     .catch(error => {
-//         console.error('Error submitting answers:', error);
-//         alert(`There was an error submitting your answers: ${error.message}. Please try again.`);
-//     });
-// }
-
-
 // Add event listener to the submit answer button
 document.getElementById('submit-answer-btn').addEventListener('click', function() {
     submitExam();

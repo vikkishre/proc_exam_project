@@ -86,15 +86,22 @@
             
             // Iterate over each test and create HTML to display it
             tests.forEach(test => {
-                const testItem = `
-                    <div class="test-item">
-                        <h4>${test.prompt}</h4>
-                        <p>Options: ${JSON.parse(test.options).join(',')}</p> <!-- Parse options from JSON and join them -->
-                        <p>Correct Answer: ${test.correct_answer}</p>
-                    </div>
+                let parsedOptions;
+                try {
+                    // Attempt to parse options as an array (in case it's a stringified array)
+                    parsedOptions = typeof test.options === 'string' ? JSON.parse(test.options) : test.options;
+                } catch (error) {
+                    // Fallback if options cannot be parsed
+                    parsedOptions = test.options.split(','); // Assumes comma-separated string in case of error
+                }
+            
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <strong>Question:</strong> ${test.prompt}<br>
+                    <span class="options">Options: ${parsedOptions.join(', ')}</span><br>
+                    <strong>Correct Answer:</strong> ${test.correct_answer}
                 `;
-                // Insert the test item into the display area
-                displayDiv.insertAdjacentHTML('beforeend', testItem);
+                testList.appendChild(li);
             });
         }
     </script>

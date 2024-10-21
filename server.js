@@ -98,10 +98,6 @@ app.post('/join_test', (req, res) => {
             return res.status(500).json({ success: false, message: 'Server error checking code.' });
         }
 
-        if (results.length === 0) {
-            return res.status(404).json({ success: false, message: 'Test code not found.' });
-        }
-
         res.json({ success: true, message: 'Code accepted! Redirecting to the test...' });
     });
 });

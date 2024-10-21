@@ -25,14 +25,24 @@
                     testList.innerHTML = '<li>No tests found.</li>';
                 } else {
                     tests.forEach(test => {
+                        let parsedOptions;
+                        try {
+                            // Attempt to parse options as an array (in case it's a stringified array)
+                            parsedOptions = typeof test.options === 'string' ? JSON.parse(test.options) : test.options;
+                        } catch (error) {
+                            // Fallback if options cannot be parsed
+                            parsedOptions = test.options.split(','); // Assumes comma-separated string in case of error
+                        }
+                    
                         const li = document.createElement('li');
                         li.innerHTML = `
                             <strong>Question:</strong> ${test.prompt}<br>
-                            <span class="options">Options: ${test.options.join(', ')}</span><br>
+                            <span class="options">Options: ${parsedOptions.join(', ')}</span><br>
                             <strong>Correct Answer:</strong> ${test.correct_answer}
                         `;
                         testList.appendChild(li);
                     });
+                    
                 }
             } catch (error) {
                 console.error('Error fetching tests:', error);
@@ -56,6 +66,7 @@
             })
             .then(response => response.json())
             .then(result => {
+                console.log(result);
                 if (result.success) {
                     alert('Code saved successfully!'); // Notify the user of success
                 } else {
