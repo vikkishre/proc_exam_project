@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Test</title>
+    <link rel="stylesheet" href="joinTest.css">
+    <script>
+        // Asynchronous function to handle the joining of a test
+        async function joinTest(event) {
+            // Prevent the default form submission behavior to handle it via JavaScript
+            event.preventDefault(); 
+
+            // Retrieve the value entered in the input field for the test code
+            const code = document.getElementById('codeInput').value; 
+
+            // Validate the entered code to ensure it matches the required 5-digit format
+            if (!/^\d{5}$/.test(code)) {
+                // Alert the user if the code is not valid
+                alert('Please enter a valid 5-digit code.');
+                return; // Exit the function if the code is invalid
+            }
+
+            // Send the validated code to the server using a POST request
+            const response = await fetch('http://localhost:3000/join_test', {
+                method: 'POST', // Specify the request method as POST
+                headers: {
+                    'Content-Type': 'application/json', // Indicate that the request body contains JSON
+                },
+                // Convert the code into a JSON string and include it in the request body
+                body: JSON.stringify({ code }) 
+            });
+
+            // Parse the JSON response from the server
+            const result = await response.json(); 
+
+            // Check if the server response indicates success
+            if (result.success) {
+                // Notify the user that the code was accepted and redirect them to the test page
+                alert('Code accepted! Redirecting to the test...');
+                window.location.href = 'http://localhost:3000/new.html'; // Redirect to the test page
+            } else {
+                // If there was an error, display the error message returned from the server
+                alert('Error: ' + result.message); 
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Join Test</h1>
+        <form id="joinTestForm" onsubmit="joinTest(event)">
+            <label for="codeInput">Enter 5-Digit Code:</label>
+            <input type="text" id="codeInput" placeholder="Enter your code" required>
+            <button type="submit">Join Test</button>
+        </form>
+    </div>
+</body>
+</html>
+

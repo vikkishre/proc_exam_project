@@ -101,6 +101,35 @@ app.get('/display_tests', (req, res) => {
     });
 });
 
+// Endpoint to handle joining a test
+// Endpoint to handle joining a test by checking if the 5-digit code exists
+app.post('/join_test', (req, res) => {
+    const { code } = req.body; // Extract the code from the request body
+
+    // Validate the code format (must be a 5-digit number)
+    if (!/^\d{5}$/.test(code)) {
+        return res.status(400).json({ success: false, message: 'Invalid code format.' });
+    }
+
+    // SQL query to check if the code exists in the 'test_codes' table
+    const query = 'SELECT * FROM test_codes WHERE code = ?';
+    db.query(query, [code], (err, results) => {
+        if (err) {
+            console.error('Error checking code:', err);
+            return res.status(500).json({ success: false, message: 'Server error checking code.' });
+        }
+
+        // If the code does not exist, return an error message
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'Test code not found.' });
+        }
+
+        // If the code exists, allow the user to join the test
+        res.json({ success: true, message: 'Code accepted! Redirecting to the test...' });
+    });
+});
+
+
 // Start the server on port 3000
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');

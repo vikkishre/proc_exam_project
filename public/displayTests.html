@@ -45,6 +45,27 @@
             // Generate a random 5-digit code
             const randomCode = generateRandomCode();
             alert(`Your random code is: ${randomCode}`); // Alert the random code
+
+            // Send the generated code to the server to store it
+            fetch('http://localhost:3000/join_test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code: randomCode }) // Send the code as JSON
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Code saved successfully!'); // Notify the user of success
+                } else {
+                    alert('Error: ' + result.message); // Show error message
+                }
+            })
+            .catch(error => {
+                console.error('Error saving code:', error);
+                alert('An error occurred while saving the code.');
+            });
         }
 
         // Function to generate a random 5-digit code

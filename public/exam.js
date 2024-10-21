@@ -156,7 +156,7 @@ function submitExam() {
     })
     .catch(error => {
         console.error('Error submitting answers:', error);
-        alert(`There was an error submitting your answers: ${error.message}. Please try again.`);
+        // alert(`There was an error submitting your answers: ${error.message}. Please try again.`);
     });
 }
 
@@ -295,154 +295,67 @@ function login(username, password) {
     });
 }
 
-// Add event listener for DOM fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('/questions')
-        .then(response => response.json())
-        .then(questions => {
-            const questionContainer = document.getElementById('question-container');
-            questions.forEach((question, index) => {
-                const questionElement = document.createElement('div');
-                questionElement.classList.add('question');
-                questionElement.setAttribute('data-id', question.id);
-
-                const prompt = document.createElement('p');
-                prompt.textContent = `Question ${index + 1}: ${question.prompt}`;
-                questionElement.appendChild(prompt);
-
-                if (question.options) {
-                    const options = question.options.split(',');
-                    options.forEach(option => {
-                        const label = document.createElement('label');
-                        label.textContent = option;
-
-                        const radio = document.createElement('input');
-                        radio.type = 'radio';
-                        radio.name = `question-${question.id}`;
-                        radio.value = option;
-                        radio.setAttribute('data-id', question.id);
-
-                        label.prepend(radio);
-                        questionElement.appendChild(label);
-                    });
-                } else {
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.placeholder = 'Your answer here';
-                    input.setAttribute('data-id', question.id);
-                    questionElement.appendChild(input);
-                }
-
-                questionContainer.appendChild(questionElement);
-            });
-        })
-        .catch(error => console.error('Error fetching questions:', error));
-});
-
 // Add event listener to the submit answer button
 document.getElementById('submit-answer-btn').addEventListener('click', function() {
     submitExam();
 });
 
 // Function to handle exam submission
-function submitExam() {
-    console.log("Submitting exam...");
-    clearInterval(timerInterval);
-    localStorage.removeItem('timeLeft'); // Clear the saved time when the exam is submitted
+// function submitExam() {
+//     console.log("Submitting exam...");
+//     clearInterval(timerInterval);
+//     localStorage.removeItem('timeLeft'); // Clear the saved time when the exam is submitted
 
-    const answers = [];
-    const questionElements = document.querySelectorAll('.question');
+//     const answers = [];
+//     const questionElements = document.querySelectorAll('.question');
 
-    questionElements.forEach(questionElement => {
-        const questionId = questionElement.getAttribute('data-id');
-        let answer = '';
+//     questionElements.forEach(questionElement => {
+//         const questionId = questionElement.getAttribute('data-id');
+//         let answer = '';
 
-        const selectedRadio = questionElement.querySelector('input[type="radio"]:checked');
-        if (selectedRadio) {
-            answer = selectedRadio.value;
-        } else {
-            const textInput = questionElement.querySelector('input[type="text"]');
-            if (textInput) {
-                answer = textInput.value.trim();
-            }
-        }
+//         const selectedRadio = questionElement.querySelector('input[type="radio"]:checked');
+//         if (selectedRadio) {
+//             answer = selectedRadio.value;
+//         } else {
+//             const textInput = questionElement.querySelector('input[type="text"]');
+//             if (textInput) {
+//                 answer = textInput.value.trim();
+//             }
+//         }
 
-        if (questionId) {
-            answers.push({ question_id: parseInt(questionId), answer: answer });
-        }
-    });
+//         if (questionId) {
+//             answers.push({ question_id: parseInt(questionId), answer: answer });
+//         }
+//     });
 
-    console.log("Answers collected:", answers);
+//     console.log("Answers collected:", answers);
 
-    fetch('/submit-answer', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ answers: answers })
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.text().then(text => {
-                throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Server response:", data);
-        // Redirect to the score page
-        window.location.href = `score.html?score=${data.score}&total=${data.total}`;
-    })
-    .catch(error => {
-        console.error('Error submitting answers:', error);
-        alert(`There was an error submitting your answers: ${error.message}. Please try again.`);
-    });
-}
+//     fetch('/submit-answer', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({ answers: answers })
+//     })
+//     .then(response => {
+//         if (!response.ok) {
+//             return response.text().then(text => {
+//                 throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+//             });
+//         }
+//         return response.json();
+//     })
+//     .then(data => {
+//         console.log("Server response:", data);
+//         // Redirect to the score page
+//         window.location.href = `score.html?score=${data.score}&total=${data.total}`;
+//     })
+//     .catch(error => {
+//         console.error('Error submitting answers:', error);
+//         alert(`There was an error submitting your answers: ${error.message}. Please try again.`);
+//     });
+// }
 
-// Add event listener for DOM fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('/questions')
-        .then(response => response.json())
-        .then(questions => {
-            const questionContainer = document.getElementById('question-container');
-            questions.forEach((question, index) => {
-                const questionElement = document.createElement('div');
-                questionElement.classList.add('question');
-                questionElement.setAttribute('data-id', question.id);
-
-                const prompt = document.createElement('p');
-                prompt.textContent = `Question ${index + 1}: ${question.prompt}`;
-                questionElement.appendChild(prompt);
-
-                if (question.options) {
-                    const options = question.options.split(',');
-                    options.forEach(option => {
-                        const label = document.createElement('label');
-                        label.textContent = option;
-
-                        const radio = document.createElement('input');
-                        radio.type = 'radio';
-                        radio.name = `question-${question.id}`;
-                        radio.value = option;
-                        radio.setAttribute('data-id', question.id);
-
-                        label.prepend(radio);
-                        questionElement.appendChild(label);
-                    });
-                } else {
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.placeholder = 'Your answer here';
-                    input.setAttribute('data-id', question.id);
-                    questionElement.appendChild(input);
-                }
-
-                questionContainer.appendChild(questionElement);
-            });
-        })
-        .catch(error => console.error('Error fetching questions:', error));
-});
 
 // Add event listener to the submit answer button
 document.getElementById('submit-answer-btn').addEventListener('click', function() {
