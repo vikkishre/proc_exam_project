@@ -5,45 +5,196 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join Test</title>
     <link rel="stylesheet" href="joinTest.css">
+    <style>
+        /* Basic Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #a8e063, #56ab2f);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin: 20px auto;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Form animation */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-message, .error-message {
+            display: none;
+            margin-top: 20px;
+            font-size: 1rem;
+        }
+
+        .success-message {
+            color: #4CAF50;
+        }
+
+        .error-message {
+            color: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            input[type="text"], button {
+                font-size: 1rem;
+            }
+        }
+    </style>
+
     <script>
         // Asynchronous function to handle the joining of a test
         async function joinTest(event) {
-            // Prevent the default form submission behavior to handle it via JavaScript
-            event.preventDefault(); 
+            event.preventDefault(); // Prevent form submission
 
-            // Retrieve the value entered in the input field for the test code
-            const code = document.getElementById('codeInput').value; 
+            const codeInput = document.getElementById('codeInput');
+            const code = codeInput.value;
+            const spinner = document.querySelector('.loading-spinner');
+            const successMessage = document.querySelector('.success-message');
+            const errorMessage = document.querySelector('.error-message');
+            const joinButton = event.target.querySelector('button');
 
-            // Validate the entered code to ensure it matches the required 5-digit format
+            // Validate input in real-time
             if (!/^\d{5}$/.test(code)) {
-                // Alert the user if the code is not valid
                 alert('Please enter a valid 5-digit code.');
-                return; // Exit the function if the code is invalid
+                return;
             }
 
-            // Send the validated code to the server using a POST request
-            const response = await fetch('http://localhost:3000/join_test', {
-                method: 'POST', // Specify the request method as POST
-                headers: {
-                    'Content-Type': 'application/json', // Indicate that the request body contains JSON
-                },
-                // Convert the code into a JSON string and include it in the request body
-                body: JSON.stringify({ code }) 
-            });
+            // Show loading spinner and disable the button
+            spinner.style.display = 'block';
+            joinButton.disabled = true;
 
-            // Parse the JSON response from the server
-            const result = await response.json(); 
+            // Simulate an API request to join the test
+            try {
+                const response = await fetch('http://localhost:3000/join_test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code })
+                });
 
-            // Check if the server response indicates success
-            if (result.success) {
-                // Notify the user that the code was accepted and redirect them to the test page
-                alert('Code accepted! Redirecting to the test...');
-                window.location.href = 'http://localhost:3000/new.html'; // Redirect to the test page
-            } else {
-                // If there was an error, display the error message returned from the server
-                alert('Error: ' + result.message); 
+                const result = await response.json();
+                spinner.style.display = 'none'; // Hide the spinner after fetching
+
+                if (result.success) {
+                    // Show success message and redirect
+                    successMessage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    successMessage.textContent = 'Code accepted! Redirecting to the test...';
+                    setTimeout(() => window.location.href = 'http://localhost:3000/new.html', 1500);
+                } else {
+                    // Show error message
+                    errorMessage.style.display = 'block';
+                    successMessage.style.display = 'none';
+                    errorMessage.textContent = 'Error: ' + result.message;
+                    joinButton.disabled = false; // Re-enable button
+                }
+            } catch (error) {
+                spinner.style.display = 'none'; // Hide spinner
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Error: Unable to connect to the server.';
+                joinButton.disabled = false; // Re-enable button
             }
         }
+
+        // Real-time validation
+        document.addEventListener('DOMContentLoaded', () => {
+            const codeInput = document.getElementById('codeInput');
+            codeInput.addEventListener('input', function() {
+                if (/^\d{5}$/.test(this.value)) {
+                    this.style.borderColor = '#4CAF50';
+                } else {
+                    this.style.borderColor = '#e74c3c';
+                }
+            });
+        });
     </script>
 </head>
 <body>
@@ -53,8 +204,10 @@
             <label for="codeInput">Enter 5-Digit Code:</label>
             <input type="text" id="codeInput" placeholder="Enter your code" required>
             <button type="submit">Join Test</button>
+            <div class="loading-spinner"></div>
+            <div class="success-message">Code accepted! Redirecting...</div>
+            <div class="error-message">Error: Something went wrong.</div>
         </form>
     </div>
 </body>
 </html>
-

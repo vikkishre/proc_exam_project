@@ -6,127 +6,77 @@
     <title>Create Test</title>
     <link rel="stylesheet" href="createTest.css">
     <script>
-        let questionCount = 1; // Initialize a counter to keep track of the number of questions added
+        let questionCount = 1;
 
-        // Function to handle the submission of the test
         async function submitTest(event) {
-            event.preventDefault(); // Prevent the default form submission behavior
+            event.preventDefault();
+            const questions = [];
+            const questionInputs = document.querySelectorAll('.question-input');
 
-            const questions = []; // Array to hold the questions to be submitted
-            const questionInputs = document.querySelectorAll('.question-input'); // Select all question input sections
-
-            // Iterate over each question input section
             questionInputs.forEach((questionInput, index) => {
-                // Get the question prompt from the input field
                 const prompt = questionInput.querySelector('input[placeholder="Enter Question"]').value;
-                // Get the options, split by comma, and trim whitespace
                 const options = document.querySelector(`#options-${index + 1}`).value.split(',').map(opt => opt.trim());
-                // Get the correct answer from the input field
                 const correctAnswer = document.querySelector(`#correct-answer-${index + 1}`).value;
 
-                // Validate inputs: ensure prompt, four options, and a correct answer are provided
                 if (prompt && options.length === 4 && correctAnswer) {
-                    // Push the validated question object into the questions array
                     questions.push({ prompt, options, correct_answer: correctAnswer });
                 }
             });
 
-            // Send a POST request to the server with the questions data
             const response = await fetch('http://localhost:3000/submit_test', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json', // Specify the content type as JSON
-                },
-                body: JSON.stringify({ questions }) // Convert the questions array to a JSON string
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ questions })
             });
 
-            const result = await response.json(); // Parse the JSON response from the server
-            alert(result.message); // Display the server's response message
+            const result = await response.json();
+            alert(result.message);
 
-            // Generate a random 5-digit code for the user
             const randomCode = generateRandomCode();
-            alert(`Your random code is: ${randomCode}`); // Alert the user with the random code
-
-            // Clear the form fields after submission
+            alert(`Your random code is: ${randomCode}`);
             document.getElementById('createTestForm').reset();
         }
 
-        // Function to generate a random 5-digit code
         function generateRandomCode() {
-            return Math.floor(10000 + Math.random() * 90000); // Generates a number between 10000 and 99999
+            return Math.floor(10000 + Math.random() * 90000);
         }
 
-        // Function to add a new question input section
         function addQuestion() {
-            questionCount++; // Increment the question count
-            const questionsDiv = document.getElementById('questions'); // Get the container for questions
-            // Create a new question input section as a string of HTML
+            questionCount++;
+            const questionsDiv = document.getElementById('questions');
             const newQuestion = `
-                <div class="question-input">
+                <div class="question-input card">
                     <h3>Question ${questionCount}:</h3>
                     <input type="text" placeholder="Enter Question" required>
-                    <br>
                     <label>Options (comma-separated):</label>
                     <input type="text" id="options-${questionCount}" placeholder="Option 1, Option 2, Option 3, Option 4" required>
-                    <br>
                     <label>Correct Answer:</label>
                     <input type="text" id="correct-answer-${questionCount}" placeholder="Correct Answer" required>
                 </div>
             `;
-            // Insert the new question input section into the questions container
             questionsDiv.insertAdjacentHTML('beforeend', newQuestion);
-        }
-
-        // Function to display previously saved questions
-        async function displayQuestions() {
-            const response = await fetch('http://localhost:3000/display_tests'); // Fetch saved tests from the server
-            const tests = await response.json(); // Parse the JSON response
-            const displayDiv = document.getElementById('displayArea'); // Get the display area for tests
-            displayDiv.innerHTML = ''; // Clear any previous results
-            
-            // Iterate over each test and create HTML to display it
-            tests.forEach(test => {
-                let parsedOptions;
-                try {
-                    // Attempt to parse options as an array (in case it's a stringified array)
-                    parsedOptions = typeof test.options === 'string' ? JSON.parse(test.options) : test.options;
-                } catch (error) {
-                    // Fallback if options cannot be parsed
-                    parsedOptions = test.options.split(','); // Assumes comma-separated string in case of error
-                }
-            
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <strong>Question:</strong> ${test.prompt}<br>
-                    <span class="options">Options: ${parsedOptions.join(', ')}</span><br>
-                    <strong>Correct Answer:</strong> ${test.correct_answer}
-                `;
-                testList.appendChild(li);
-            });
         }
     </script>
 </head>
 <body>
     <div class="container">
-        <h1>Create Test</h1>
-        <form id="createTestForm" onsubmit="submitTest(event)"> <!-- Form to create a test -->
-            <div id="questions"> <!-- Container for question inputs -->
-                <div class="question-input"> <!-- First question input section -->
+        <h1><i class="fas fa-pen-alt"></i> Create a Test</h1>
+        <form id="createTestForm" onsubmit="submitTest(event)">
+            <div id="questions">
+                <div class="question-input card">
                     <h3>Question 1:</h3>
                     <input type="text" placeholder="Enter Question" required>
-                    <br>
                     <label>Options (comma-separated):</label>
                     <input type="text" id="options-1" placeholder="Option 1, Option 2, Option 3, Option 4" required>
-                    <br>
                     <label>Correct Answer:</label>
                     <input type="text" id="correct-answer-1" placeholder="Correct Answer" required>
                 </div>
             </div>
-            <button type="button" onclick="addQuestion()">Add Another Question</button> <!-- Button to add more questions -->
-            <button type="submit">Submit Questions</button> <!-- Button to submit the test -->
+            <button type="button" class="add-question-btn" onclick="addQuestion()">Add Another Question</button>
+            <button type="submit" class="submit-btn">Submit Test</button>
         </form>
-        <button type="button" onclick="window.location.href='displayTests.html'">Display Questions</button> <!-- Button to navigate to display tests -->
-        <div id="displayArea"></div> <!-- Area to display saved tests -->
+        <button type="button" class="display-questions-btn" onclick="window.location.href='displayTests.html'">Display Questions</button>
+        <div id="displayArea"></div>
     </div>
 </body>
 </html>

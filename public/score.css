@@ -7,8 +7,7 @@ body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #007bff, #00c6ff);
-    color: #333;
+    background: linear-gradient(135deg, #f0f4c3, #b2ebf2); /* Light gradient background */
 }
 
 header {
@@ -19,27 +18,6 @@ header {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-nav ul {
-    list-style: none;
-    padding: 0;
-}
-
-nav ul li {
-    display: inline;
-    margin: 0 15px;
-}
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s;
-}
-
-nav ul li a:hover {
-    color: #ffd700; /* Gold color on hover */
-}
-
 main {
     display: flex;
     justify-content: center;
@@ -48,26 +26,30 @@ main {
     min-height: calc(100vh - 120px); /* Adjust height considering header and footer */
 }
 
-#exam-container {
+#score-container {
     background: white;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     padding: 30px;
-    max-width: 600px;
-    margin: auto;
+    text-align: center;
     animation: fadeIn 1s ease;
 }
 
 h2 {
-    text-align: center;
-    margin-bottom: 15px;
-    font-weight: 600;
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: #333;
 }
 
-#timer {
-    font-size: 1.2em;
-    text-align: center;
+h3 {
+    font-size: 1.5em;
     margin-bottom: 20px;
+    color: #555;
+}
+
+#score, #total {
+    font-weight: bold;
+    color: #007bff; /* Highlighted score */
 }
 
 button {
@@ -78,8 +60,6 @@ button {
     border-radius: 50px;
     cursor: pointer;
     font-size: 1.1em;
-    margin: 5px 0;
-    width: 100%;
     transition: background-color 0.3s, transform 0.2s;
 }
 
@@ -95,6 +75,7 @@ footer {
     color: white;
 }
 
+/* Animation for score container */
 @keyframes fadeIn {
     0% {
         opacity: 0;
@@ -104,28 +85,4 @@ footer {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-/* Style for the question text */
-.question p {
-    font-weight: bold;
-    font-size: 1.2em;
-    margin-bottom: 10px;
-}
-
-/* Style for the options */
-.question label {
-    font-size: 1em;
-    opacity: 0.8;
-    display: block;
-    margin-bottom: 5px;
-}
-
-/* Optional: Style for the input fields */
-.question input[type="text"] {
-    font-size: 1em;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    width: 100%;
-    box-sizing: border-box;
 }

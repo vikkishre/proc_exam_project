@@ -17,83 +17,97 @@
                 const tests = await response.json();
                 const testList = document.getElementById('testList');
         
-                // Clear previous entries
-                testList.innerHTML = '';
+                testList.innerHTML = ''; // Clear previous entries
         
-                // Check if tests are returned
                 if (tests.length === 0) {
                     testList.innerHTML = '<li>No tests found.</li>';
                 } else {
-                    tests.forEach(test => {
+                    tests.forEach((test, index) => {
                         let parsedOptions;
                         try {
-                            // Attempt to parse options as an array (in case it's a stringified array)
                             parsedOptions = typeof test.options === 'string' ? JSON.parse(test.options) : test.options;
                         } catch (error) {
-                            // Fallback if options cannot be parsed
-                            parsedOptions = test.options.split(','); // Assumes comma-separated string in case of error
+                            parsedOptions = test.options.split(',');
                         }
                     
                         const li = document.createElement('li');
+                        li.classList.add('test-item'); // Add a class for styling
                         li.innerHTML = `
-                            <strong>Question:</strong> ${test.prompt}<br>
-                            <span class="options">Options: ${parsedOptions.join(', ')}</span><br>
-                            <strong>Correct Answer:</strong> ${test.correct_answer}
+                            <div class="card">
+                                <div class="question-header" onclick="toggleDetails(${index})">
+                                    <h2>Question: ${index + 1}</h2>
+                                    <i class="arrow down"></i>
+                                </div>
+                                <div class="question-body" id="details-${index}" style="display: none;">
+                                    <p>${test.prompt}</p>
+                                    <h3>Options:</h3>
+                                    <p class="options">${parsedOptions.join(', ')}</p>
+                                    <h3>Correct Answer:</h3>
+                                    <p>${test.correct_answer}</p>
+                                </div>
+                            </div>
                         `;
                         testList.appendChild(li);
                     });
-                    
                 }
             } catch (error) {
                 console.error('Error fetching tests:', error);
                 const testList = document.getElementById('testList');
-                testList.innerHTML = '<li>Error loading tests. Please try again later.</li>';
+                testList.innerHTML = '<li class="error-message">Error loading tests. Please try again later.</li>';
+            }
+        }
+
+        function toggleDetails(index) {
+            const details = document.getElementById(`details-${index}`);
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
             }
         }
 
         function submitTests() {
-            // Generate a random 5-digit code
             const randomCode = generateRandomCode();
-            alert(`Your random code is: ${randomCode}`); // Alert the random code
+            alert(`Your random code is: ${randomCode}`);
 
-            // Send the generated code to the server to store it
             fetch('http://localhost:3000/join_test', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ code: randomCode }) // Send the code as JSON
+                body: JSON.stringify({ code: randomCode })
             })
             .then(response => response.json())
             .then(result => {
-                console.log(result);
                 if (result.success) {
-                    alert('Code saved successfully!'); // Notify the user of success
+                    alert('Code saved successfully!');
                 } else {
-                    alert('Error: ' + result.message); // Show error message
+                    alert('Error: ' + result.message);
                 }
             })
             .catch(error => {
-                console.error('Error saving code:', error);
                 alert('An error occurred while saving the code.');
             });
         }
 
-        // Function to generate a random 5-digit code
         function generateRandomCode() {
-            return Math.floor(10000 + Math.random() * 90000); // Generates a number between 10000 and 99999
+            return Math.floor(10000 + Math.random() * 90000);
         }
 
-        window.onload = fetchTests; // Fetch tests on page load
+        window.onload = fetchTests;
     </script>
 </head>
 <body>
     <div class="container">
-        <h1>All Questions for Test</h1>
+        <header>
+            <h1>Test Questions</h1>
+        </header>
         <ul id="testList"></ul>
-        <button onclick="fetchTests()">Refresh Questions</button>
-        <button onclick="window.location.href='createTest.html'">Go Back to Create Test</button>
-        <button onclick="submitTests()">Submit Tests</button> <!-- New Submit Button -->
+        <div class="button-group">
+            <button class="refresh-btn" onclick="fetchTests()">Refresh Questions</button>
+            <button class="create-btn" onclick="window.location.href='createTest.html'">Go Back to Create Test</button>
+            <button class="submit-btn" onclick="submitTests()">Submit Tests</button>
+        </div>
     </div>
 </body>
 </html>

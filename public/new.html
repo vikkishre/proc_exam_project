@@ -3,46 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fullscreen Exit Alert</title>
+    <title>Fullscreen Exam Alert</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* Basic styling to ensure visibility */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #007bff, #00c6ff);
+            color: white;
+            text-align: center;
+        }
+
+        #fullscreen-message {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1.5s ease;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
         #enter-fullscreen-btn {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            background: #28a745;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        #enter-fullscreen-btn:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
     </style>
 </head>
 <body>
-    <div id="fullscreen-message" style="text-align: center; margin-top: 20%;">
+    <div id="fullscreen-message">
         <h1>Enter Fullscreen to Start the Exam</h1>
-        <p>Please ensure that your browser is in fullscreen mode before proceeding.<b>(By pressing F11)</b></p>
-        
+        <p>Please ensure your browser is in fullscreen mode before proceeding.<br><b>(Press F11)</b></p>
         <button id="enter-fullscreen-btn" onclick="enterFullscreen()">Enter Test Screen</button>
     </div>
 
     <script>
         function enterFullscreen() {
-            let element = document.documentElement; // The entire page
+            let element = document.documentElement;
 
-            // Request fullscreen
             if (element.requestFullscreen) {
                 element.requestFullscreen();
-            } else if (element.mozRequestFullScreen) { // Firefox
+            } else if (element.mozRequestFullScreen) { 
                 element.mozRequestFullScreen();
-            } else if (element.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            } else if (element.webkitRequestFullscreen) { 
                 element.webkitRequestFullscreen();
-            } else if (element.msRequestFullscreen) { // IE/Edge
+            } else if (element.msRequestFullscreen) { 
                 element.msRequestFullscreen();
             }
 
-            // Immediately navigate to index.html after requesting fullscreen
             navigateToIndex();
         }
 
         function navigateToIndex() {
-            window.location.href = 'http://localhost:3000/index.html';
+            setTimeout(function() {
+                window.location.href = 'http://localhost:3000/index.html';
+            }, 1000); // Adds a short delay for a smooth transition
         }
     </script>
 </body>

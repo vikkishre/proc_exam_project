@@ -320,17 +320,6 @@ function enterFullscreen() {
     }
 }
 
-document.addEventListener('fullscreenchange', function () {
-    if (!document.fullscreenElement) {
-        alert("You have exited full-screen mode. Please re-enter full-screen.");
-        violationCount++; // Increment violation count on exit
-        console.log("Violation count after exiting fullscreen:", violationCount);
-        if (violationCount >= maxViolations) {
-            console.log("Blocking user due to violation count:", violationCount);
-            blockExam(); // Block the exam if violations exceed the limit
-        }
-    }
-});
 
 
 
